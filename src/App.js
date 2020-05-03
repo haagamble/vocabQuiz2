@@ -141,11 +141,16 @@ class App extends React.Component {
         numberWrong: prevState.numberWrong + 1,
         answerMessage: "Incorrect",
         answerMessage2: msg,
-        answer: "",
+        answer: ""
         //if the user answer is incorrect, add the word to the
         //userPractice array
-        userPractice: [...prevState.userPractice, lst[qn]]
+        //userPractice: [...prevState.userPractice, lst[qn]]
       }));
+      if (!this.state.userPractice.includes(lst[qn])) {
+        this.setState(prevState => ({
+          userPractice: [...prevState.userPractice, lst[qn]]
+        }));
+      }
     }
 
     //test if the game is over
@@ -246,10 +251,15 @@ class App extends React.Component {
               <div>
                 <p>
                   Practice the words that you have answered incorrectly during
-                  this session by clicking the Try Again button.
+                  this session by clicking the Practice button below. Your
+                  practice list currently has {this.state.userPractice.length}{" "}
+                  {this.state.userPractice.length === 1
+                    ? "question"
+                    : "questions"}
+                  .
                 </p>
                 <button onClick={() => this.handleClick("practice")}>
-                  Try Again
+                  Practice
                 </button>
               </div>
             ) : null}
@@ -284,8 +294,8 @@ class App extends React.Component {
               {" of "}
               {this.state.currentList.length}
             </p>
-            <p>Length of current game list: {this.state.currentList.length}</p>
-            <p>Length of userPractice list: {this.state.userPractice.length}</p>
+            <p>Length of current list: {this.state.currentList.length}</p>
+            <p>Length of practice list: {this.state.userPractice.length}</p>
             <form
               onSubmit={
                 this.state.practicing
