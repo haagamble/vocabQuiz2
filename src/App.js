@@ -2,6 +2,18 @@ import React from "react";
 //import ReactDOM from "react-dom";
 import "./styles.css";
 import vocabMix from "./vocabMix";
+import Tally from "./components/Tally";
+import AnswerMessages from "./components/AnswerMessages";
+//Question is complicated. Try again later.
+//import Question from "./components/Question";
+import ListButtons from "./components/ListButtons";
+//can't figure out PracticeButton either. how to pass in parameter
+//import PracticeButton from "./components/PracticeButton";
+import StartGameButton from "./components/StartGameButton";
+import StartOverButton from "./components/StartOverButton";
+import ChooseNewListButton from "./components/ChooseNewListButton";
+//VocabMixButtons doesn't work yet
+//import VocabMixButtons from "./components/VocabMixButtons";
 
 //vocabMix is the only list at the moment
 class App extends React.Component {
@@ -151,7 +163,7 @@ class App extends React.Component {
 
     event.preventDefault();
   };
-
+  xx;
   //this is called when user submits answer in practice
   //submitting on the practice test is a bit different
   //words are removed from the array if answered correctly
@@ -159,62 +171,23 @@ class App extends React.Component {
   //callState is called twice
   //function not working. see also handleSubmitPractice2
   handleSubmitPractice = event => {
-    console.log("in handleSubmitPractice");
-    let qn = this.state.questionNumber;
-    let lst = this.state.currentList;
-    //message given to user showing all correct answers
-    let msg = `${lst[qn].eng}: ${lst[qn].taj.join(" or ")}`;
-    //if answer is correct
-    if (lst[qn].taj.includes(this.state.answer)) {
-      this.setState(prevState => ({
-        numberRight: prevState.numberRight + 1,
-        answerMessage: "Correct",
-        answerMessage2: msg,
-        answer: "",
-        //remove word from practiceArray
-        userPractice: prevState.userPractice.splice(qn, 1)
-      }));
-    } else {
-      this.setState(prevState => ({
-        numberWrong: prevState.numberWrong + 1,
-        answerMessage: "Incorrect",
-        answerMessage2: msg,
-        answer: ""
-      }));
-    }
-
-    //if game has ended
-    if (qn === this.state.currentList.length - 1) {
-      this.setState(prevState => ({
-        gameOver: true,
-        questionNumber: 0
-      }));
-    } else {
-      this.setState(prevState => ({
-        questionNumber: prevState.questionNumber + 1
-      }));
-    }
-    event.preventDefault();
-  };
-
-  //handleSubmitPractice2
-  //setState is only called once
-  //in this attempt if statements are nested
-  //this also doesn't work
-  handleSubmitPractice2 = event => {
     console.log("in handleSubmitPractice2");
     let qn = this.state.questionNumber;
     let lst = this.state.currentList;
     //message given to user showing all correct answers
     let msg = `${lst[qn].eng}: ${lst[qn].taj.join(" or ")}`;
     //if answer is correct
-    if (lst[qn].taj.includes(this.state.answer)) {
+    if (lst[this.state.questionNumber].taj.includes(this.state.answer)) {
       //test if quiz is finished
       if (qn === this.state.currentList.length - 1) {
         this.setState(prevState => ({
           gameOver: true,
           questionNumber: 0,
-          userPractice: prevState.userPractice.splice(qn, 1),
+          //userPractice: prevState.userPractice.splice(qn, 1),
+          //userPractice: [...prevState.userPractice.splice(qn, 1)],
+          userPractice: prevState.userPractice.filter(
+            (__, index) => index !== qn
+          ),
           numberRight: prevState.numberRight + 1,
           answerMessage: "Correct",
           answerMessage2: msg,
@@ -223,7 +196,11 @@ class App extends React.Component {
       } else {
         this.setState(prevState => ({
           questionNumber: prevState.questionNumber + 1,
-          userPractice: prevState.userPractice.splice(qn, 1),
+          //userPractice: [...prevState.userPractice.splice(qn, 1)],
+          //userPractice: prevState.userPractice.splice(qn, 1),
+          userPractice: prevState.userPractice.filter(
+            (__, index) => index !== qn
+          ),
           numberRight: prevState.numberRight + 1,
           answerMessage: "Correct",
           answerMessage2: msg,
@@ -261,30 +238,10 @@ class App extends React.Component {
   render() {
     return (
       <div className="pageStyle">
-        <h1>Vocab Practice</h1>
-        <p>
-          handleSubmitPractice not working properly. Array is not being altered
-          correctly. practiceArray is a visible list choice only after user has
-          answered some questions incorrectly.
-        </p>
-        <p>
-          handleSubmitPractice2 is another attempt. When user answers correctly
-          the first time while doing the practice list, 2 answers are removed
-          from the practice array, and the current list is also shortened by 2
-          (which doesn't make sense because state of current list is not
-          changed) in this function. handleSubmitPractice is called around line
-          330.
-        </p>
-        <p>
-          To test in English choose Vocab Mix then level 6. Answer all questions
-          in English with the same word as the question or "test".
-        </p>
+        <h1>Vocab Practice (VocabQuiz2)</h1>
         {this.state.uiScreen === "start" ? (
           <div>
-            <h2>Select word list</h2>
-            <button onClick={this.getCategory}>Vocab Mix</button>
-            <button className="addLater">Vocab 1</button>
-            <button className="addLater">Vocab 2</button>
+            <ListButtons onClick={this.getCategory} />
             {this.state.userPractice.length > 0 ? (
               <div>
                 <p>
@@ -313,15 +270,9 @@ class App extends React.Component {
               <button onClick={() => this.handleClick(7)}>Level 7</button>
               <button onClick={() => this.handleClick(0)}>All</button>
             </div>
+
             {this.state.listChosen ? (
-              <div>
-                <button
-                  className="startButton"
-                  onClick={() => this.startGame()}
-                >
-                  Start
-                </button>
-              </div>
+              <StartGameButton onClick={() => this.startGame()} />
             ) : null}
           </div>
         ) : null}
@@ -359,40 +310,26 @@ class App extends React.Component {
           </div>
         ) : null}
 
-        {this.state.gameOver ? <h2>game over</h2> : null}
-
         {this.state.uiScreen === "game" ? (
           <div>
-            <div className="messageDiv">
-              <h2
-                className={
-                  this.state.answerMessage === "Correct"
-                    ? "greenMessage"
-                    : "redMessage"
-                }
-              >
-                {this.state.answerMessage}
-              </h2>
-              <h3>{this.state.answerMessage2}</h3>
-            </div>
-            <h3 className="rightTally">{`Right: ${this.state.numberRight}`}</h3>
-            <h3 className="wrongTally">{`Wrong: ${this.state.numberWrong}`}</h3>
+            <AnswerMessages
+              msg1={this.state.answerMessage}
+              msg2={this.state.answerMessage2}
+            />
+
+            <Tally
+              right={this.state.numberRight}
+              wrong={this.state.numberWrong}
+            />
           </div>
         ) : null}
 
         {this.state.uiScreen !== "start" && !this.state.gameOver ? (
-          <div>
-            <button className="startOverButton" onClick={this.resetGame}>
-              Start over
-            </button>
-          </div>
+          <StartOverButton onClick={this.resetGame} />
         ) : null}
 
         {this.state.gameOver ? (
-          <div>
-            <h3>game over</h3>
-            <button onClick={this.resetGame}>Choose new list</button>
-          </div>
+          <ChooseNewListButton onClick={this.resetGame} />
         ) : null}
       </div>
     );
