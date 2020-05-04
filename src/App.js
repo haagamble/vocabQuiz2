@@ -8,7 +8,7 @@ import AnswerMessages from "./components/AnswerMessages";
 //import Question from "./components/Question";
 import ListButtons from "./components/ListButtons";
 //can't figure out PracticeButton either. how to pass in parameter
-//import PracticeButton from "./components/PracticeButton";
+import PracticeButton from "./components/PracticeButton";
 import StartGameButton from "./components/StartGameButton";
 import StartOverButton from "./components/StartOverButton";
 import ChooseNewListButton from "./components/ChooseNewListButton";
@@ -60,7 +60,7 @@ class App extends React.Component {
   };
 
   //called when user selects button for list
-  handleClick = whichList => {
+  handleClick = whichList => () => {
     //list defines level (currently only works for vocabMix list)
     console.log(whichList);
     //practiceList is array of words user got wrong
@@ -248,20 +248,10 @@ class App extends React.Component {
           <div>
             <ListButtons onClick={this.getCategory} />
             {this.state.userPractice.length > 0 ? (
-              <div>
-                <p>
-                  Practice the words that you have answered incorrectly during
-                  this session by clicking the Practice button below. Your
-                  practice list currently has {this.state.userPractice.length}{" "}
-                  {this.state.userPractice.length === 1
-                    ? "question"
-                    : "questions"}
-                  .
-                </p>
-                <button onClick={() => this.handleClick("practice")}>
-                  Practice
-                </button>
-              </div>
+              <PracticeButton
+                onHandleClick={this.handleClick("practice")}
+                userPr={this.state.userPractice}
+              />
             ) : null}
           </div>
         ) : null}
@@ -271,14 +261,14 @@ class App extends React.Component {
             <h3>Vocab Mix - choose a level</h3>
             <h3>{this.state.currentList.length} words</h3>
             <div>
-              <button onClick={() => this.handleClick(1)}>Level 1</button>
-              <button onClick={() => this.handleClick(2)}>Level 2</button>
-              <button onClick={() => this.handleClick(3)}>Level 3</button>
-              <button onClick={() => this.handleClick(4)}>Level 4</button>
-              <button onClick={() => this.handleClick(5)}>Level 5</button>
-              <button onClick={() => this.handleClick(6)}>Level 6</button>
-              <button onClick={() => this.handleClick(7)}>Level 7</button>
-              <button onClick={() => this.handleClick(0)}>All</button>
+              <button onClick={this.handleClick(1)}>Level 1</button>
+              <button onClick={this.handleClick(2)}>Level 2</button>
+              <button onClick={this.handleClick(3)}>Level 3</button>
+              <button onClick={this.handleClick(4)}>Level 4</button>
+              <button onClick={this.handleClick(5)}>Level 5</button>
+              <button onClick={this.handleClick(6)}>Level 6</button>
+              <button onClick={this.handleClick(7)}>Level 7</button>
+              <button onClick={this.handleClick(0)}>All</button>
             </div>
 
             {this.state.listChosen ? (
