@@ -9,7 +9,7 @@ function PracticeButton(props) {
         currently has {props.userPr.length}{" "}
         {props.userPr.length === 1 ? "question" : "questions"}.
       </p>
-      <button onClick={props.onHandleClick}>Try Again</button>
+      <button onClick={props.onHandleClick}>Practice</button>
     </div>
   );
 }

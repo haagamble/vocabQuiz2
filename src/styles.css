@@ -3,12 +3,31 @@
   text-align: center;
 }
 
+body {
+  margin: 0;
+}
+
+.notHeader {
+  margin: 20px;
+}
+
 .pageStyle {
-  margin-left: 20px;
+  margin-left: 0px;
+}
+
+header {
+  background-color: #282c34;
+  min-height: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
 
 h1 {
-  color: purple;
+  color: lightgray;
 }
 button {
   margin-left: 10px;
