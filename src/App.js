@@ -12,8 +12,7 @@ import PracticeButton from "./components/PracticeButton";
 import StartGameButton from "./components/StartGameButton";
 import StartOverButton from "./components/StartOverButton";
 import ChooseNewListButton from "./components/ChooseNewListButton";
-//VocabMixButtons doesn't work yet
-//import VocabMixButtons from "./components/VocabMixButtons";
+import VocabMixButtons from "./components/VocabMixButtons";
 
 //vocabMix is the only list at the moment
 class App extends React.Component {
@@ -249,16 +248,16 @@ class App extends React.Component {
             <div>
               <h3>Vocab Mix - choose a level</h3>
               <h3>{this.state.currentList.length} words</h3>
-              <div>
-                <button onClick={this.handleClick(1)}>Level 1</button>
-                <button onClick={this.handleClick(2)}>Level 2</button>
-                <button onClick={this.handleClick(3)}>Level 3</button>
-                <button onClick={this.handleClick(4)}>Level 4</button>
-                <button onClick={this.handleClick(5)}>Level 5</button>
-                <button onClick={this.handleClick(6)}>Level 6</button>
-                <button onClick={this.handleClick(7)}>Level 7</button>
-                <button onClick={this.handleClick(0)}>All</button>
-              </div>
+              <VocabMixButtons
+                onHandleClick1={this.handleClick(1)}
+                onHandleClick2={this.handleClick(2)}
+                onHandleClick3={this.handleClick(3)}
+                onHandleClick4={this.handleClick(4)}
+                onHandleClick5={this.handleClick(5)}
+                onHandleClick6={this.handleClick(6)}
+                onHandleClick7={this.handleClick(7)}
+                onHandleClick8={this.handleClick(0)}
+              />
 
               {this.state.listChosen ? (
                 <StartGameButton onClick={() => this.startGame()} />
