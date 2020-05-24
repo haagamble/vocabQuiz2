@@ -9,6 +9,7 @@ function AnswerMessages(props) {
         >
           {props.msg1}
         </h2>
+        <h3>Your answer: {props.msg3}</h3>
         <h3>{props.msg2}</h3>
       </div>
     </div>

@@ -11,8 +11,9 @@ import ListButtons from "./components/ListButtons";
 import PracticeButton from "./components/PracticeButton";
 import StartGameButton from "./components/StartGameButton";
 import StartOverButton from "./components/StartOverButton";
-import ChooseNewListButton from "./components/ChooseNewListButton";
-import VocabMixButtons from "./components/VocabMixButtons";
+//import ChooseNewListButton from "./components/ChooseNewListButton";
+//delete this component. buttons are now in this page
+//import VocabMixButtons from "./components/VocabMixButtons";
 
 //vocabMix is the only list at the moment
 class App extends React.Component {
@@ -25,12 +26,13 @@ class App extends React.Component {
     this.state = {
       numberRight: 0,
       numberWrong: 0,
-      level: 1,
+      //level: 1,
       list: vocabMix,
       currentList: [],
       listChosen: false,
       category: "",
       answer: "",
+      userAnswerSaved: "",
       questionNumber: 0,
       gameStarted: false,
       gameOver: false,
@@ -47,7 +49,7 @@ class App extends React.Component {
   getCategory = () => {
     this.setState(state => ({
       category: "vocabMix",
-      uiScreen: "vocabMixButtons"
+      uiScreen: "levelSelect"
     }));
   };
 
@@ -61,17 +63,8 @@ class App extends React.Component {
   //called when user selects button for list
   handleClick = whichList => () => {
     //list defines level (currently only works for vocabMix list)
-    //practiceList is array of words user got wrong
-    if (whichList === "practice") {
-      this.setState(state => ({
-        currentList: this.state.userPractice,
-        listChosen: true,
-        practicing: true
-      }));
-      this.startGame();
-    }
     //level 0 is all words in vocabMix
-    else if (whichList === 0) {
+    if (whichList === 0) {
       this.setState(state => ({
         currentList: vocabMix,
         listChosen: true,
@@ -88,6 +81,17 @@ class App extends React.Component {
         practicing: false
       }));
     }
+  };
+
+  //called when user clicks practice button
+  handlePracticeClick = () => () => {
+    //practiceList is array of words user got wrong
+    this.setState(state => ({
+      currentList: this.state.userPractice,
+      listChosen: true,
+      practicing: true
+    }));
+    this.startGame();
   };
 
   startGame = () => {
@@ -114,8 +118,123 @@ class App extends React.Component {
 
   //this updates the input field as user types
   handleChange = event => {
-    this.setState({ answer: event.target.value });
+    this.setState({
+      answer: event.target.value,
+      userAnswerSaved: event.target.value
+    });
   };
+
+  renderStartUI() {
+    return (
+      <div>
+        <ListButtons onClick={this.getCategory} />
+        {this.state.userPractice.length > 0 && (
+          <PracticeButton
+            onHandleClick={this.handlePracticeClick()}
+            userPr={this.state.userPractice}
+          />
+        )}
+      </div>
+    );
+  }
+
+  renderLevelUI() {
+    return (
+      <div>
+        {this.renderLevelButtons()}
+        {/* {this.state.listChosen ? (
+          <StartGameButton onClick={() => this.startGame()} />
+        ) : null} */}
+        <StartOverButton onClick={this.resetGame} />
+        {this.state.listChosen ? (
+          <StartGameButton onClick={() => this.startGame()} />
+        ) : null}
+      </div>
+    );
+  }
+
+  renderGameUI() {
+    return (
+      <div className="questionDiv">
+        <p>
+          Question: {this.state.questionNumber + 1}
+          {" of "}
+          {this.state.currentList.length}
+        </p>
+
+        <form
+          onSubmit={
+            this.state.practicing
+              ? this.handleSubmitPractice
+              : this.handleSubmit
+          }
+        >
+          <label>
+            {this.state.currentList[this.state.questionNumber].eng}
+            <input
+              type="text"
+              autoCorrect="false"
+              autoCapitalize="none"
+              autoComplete="false"
+              keyboardtype="visible-password"
+              value={this.state.answer}
+              onChange={this.handleChange}
+            />
+          </label>
+          <input type="submit" value="Submit" />
+        </form>
+
+        <div>
+          <AnswerMessages
+            msg1={this.state.answerMessage}
+            msg2={this.state.answerMessage2}
+            msg3={this.state.userAnswerSaved}
+          />
+
+          <Tally
+            right={this.state.numberRight}
+            wrong={this.state.numberWrong}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  renderGameOverUI() {
+    return (
+      <div>
+        <h2>Game Over</h2>
+
+        <AnswerMessages
+          msg1={this.state.answerMessage}
+          msg2={this.state.answerMessage2}
+          msg3={this.state.userAnswerSaved}
+        />
+
+        <Tally right={this.state.numberRight} wrong={this.state.numberWrong} />
+        <StartOverButton onClick={this.resetGame} />
+      </div>
+    );
+  }
+
+  //renders the buttons for the chosen list
+  //currently the only list option is vocab list
+  renderLevelButtons() {
+    return (
+      <div>
+        <h3>Vocab Mix - choose a level</h3>
+        <h3>{this.state.currentList.length} words</h3>
+        <button onClick={this.handleClick(1)}>Level 1</button>
+        <button onClick={this.handleClick(2)}>Level 2</button>
+        <button onClick={this.handleClick(3)}>Level 3</button>
+        <button onClick={this.handleClick(4)}>Level 4</button>
+        <button onClick={this.handleClick(5)}>Level 5</button>
+        <button onClick={this.handleClick(6)}>Level 6</button>
+        <button onClick={this.handleClick(7)}>Level 7</button>
+        <button onClick={this.handleClick(8)}>All</button>
+      </div>
+    );
+  }
 
   //this is called when user submits their answer
   //for practicing missed words handleSubmitPractice is called instead
@@ -152,7 +271,8 @@ class App extends React.Component {
     if (qn === this.state.currentList.length - 1) {
       this.setState(prevState => ({
         gameOver: true,
-        questionNumber: 0
+        questionNumber: 0,
+        uiScreen: "gameOver"
       }));
     } else {
       this.setState(prevState => ({
@@ -162,7 +282,7 @@ class App extends React.Component {
 
     event.preventDefault();
   };
-  xx;
+
   //this is called when user submits answer in practice
   //submitting on the practice test is a bit different
   //words are removed from the array if answered correctly
@@ -232,93 +352,10 @@ class App extends React.Component {
       <div className="pageStyle">
         <AppHeader />
         <div className="notHeader">
-          {this.state.uiScreen === "start" ? (
-            <div>
-              <ListButtons onClick={this.getCategory} />
-              {this.state.userPractice.length > 0 ? (
-                <PracticeButton
-                  onHandleClick={this.handleClick("practice")}
-                  userPr={this.state.userPractice}
-                />
-              ) : null}
-            </div>
-          ) : null}
-
-          {this.state.uiScreen === "vocabMixButtons" ? (
-            <div>
-              <h3>Vocab Mix - choose a level</h3>
-              <h3>{this.state.currentList.length} words</h3>
-              <VocabMixButtons
-                onHandleClick1={this.handleClick(1)}
-                onHandleClick2={this.handleClick(2)}
-                onHandleClick3={this.handleClick(3)}
-                onHandleClick4={this.handleClick(4)}
-                onHandleClick5={this.handleClick(5)}
-                onHandleClick6={this.handleClick(6)}
-                onHandleClick7={this.handleClick(7)}
-                onHandleClick8={this.handleClick(0)}
-              />
-
-              {this.state.listChosen ? (
-                <StartGameButton onClick={() => this.startGame()} />
-              ) : null}
-            </div>
-          ) : null}
-
-          {this.state.uiScreen === "game" && !this.state.gameOver ? (
-            <div className="questionDiv">
-              <p>
-                Question: {this.state.questionNumber + 1}
-                {" of "}
-                {this.state.currentList.length}
-              </p>
-              <p>Length of current list: {this.state.currentList.length}</p>
-              <p>Length of practice list: {this.state.userPractice.length}</p>
-              <form
-                onSubmit={
-                  this.state.practicing
-                    ? this.handleSubmitPractice
-                    : this.handleSubmit
-                }
-              >
-                <label>
-                  {this.state.currentList[this.state.questionNumber].eng}
-                  <input
-                    type="text"
-                    autoCorrect="false"
-                    autoCapitalize="none"
-                    autoComplete="false"
-                    keyboardtype="visible-password"
-                    value={this.state.answer}
-                    onChange={this.handleChange}
-                  />
-                </label>
-                <input type="submit" value="Submit" />
-              </form>
-            </div>
-          ) : null}
-
-          {this.state.uiScreen === "game" ? (
-            <div>
-              <AnswerMessages
-                msg1={this.state.answerMessage}
-                msg2={this.state.answerMessage2}
-              />
-
-              <Tally
-                right={this.state.numberRight}
-                wrong={this.state.numberWrong}
-              />
-            </div>
-          ) : null}
-
-          {this.state.uiScreen !== "start" && !this.state.gameOver ? (
-            <StartOverButton onClick={this.resetGame} />
-          ) : null}
-
-          {this.state.gameOver ? (
-            <ChooseNewListButton onClick={this.resetGame} />
-          ) : null}
+          {this.state.uiScreen === "start" && this.renderStartUI()}
+          {this.state.uiScreen === "levelSelect" && this.renderLevelUI()}
+          {this.state.uiScreen === "game" && this.renderGameUI()}
+          {this.state.uiScreen === "gameOver" && this.renderGameOverUI()}
         </div>
       </div>
     );
